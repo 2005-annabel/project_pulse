@@ -3,27 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProjectPulse | Enterprise Workstation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    </style>
+    <title>Project Pulse - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body class="bg-[#fafafa] text-slate-800 min-h-screen antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen">
 
-    <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md shadow-indigo-200">P</div>
-                <div>
-                    <span class="text-xl font-extrabold tracking-tight text-slate-900">Project<span class="text-indigo-600">Pulse</span></span>
-                    <span class="ml-2 px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full bg-slate-100 text-slate-600 border border-slate-200">v2.0</span>
-                </div>
+                <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-md shadow-indigo-100">P</div>
+                <span class="text-lg font-extrabold tracking-tight bg-gradient-to-r bg-clip-text from-indigo-600 to-slate-900">Project<span class="text-indigo-600">Pulse</span></span>
             </div>
-            
+
             <div class="flex items-center space-x-6">
                 <div class="text-right hidden sm:block">
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Session</p>
@@ -34,9 +25,13 @@
                         {% endif %}
                     </p>
                 </div>
-                <a href="{% url 'logout' %}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-slate-200 rounded-xl transition duration-200">
-                    Sign Out
-                </a>
+                
+                <form action="{% url 'logout' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-slate-200 rounded-xl transition duration-200 cursor-pointer">
+                        Sign Out
+                    </button>
+                </form>
             </div>
         </div>
     </nav>
@@ -46,7 +41,7 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
             <div>
                 <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Workstation Dashboard</h1>
-                <p class="text-slate-500 mt-1 text-sm">Monitor organizational objectives and keep tracks synchronized.</p>
+                <p class="text-slate-500 mt-1 text-sm">Monitor organizational objectives and manage discrete CRUD permissions matrix allocations.</p>
             </div>
             
             {% if request.user.is_superuser %}
@@ -64,189 +59,98 @@
         </div>
 
         {% if alerts %}
-        <div class="mb-10 space-y-4">
-            <div class="flex items-center space-x-2 mb-2">
-                <span class="h-2 w-2 rounded-full bg-rose-500 animate-pulse"></span>
-                <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400">System Comms & Dispatch Feeds</h3>
-            </div>
-            
+        <div class="mb-10 space-y-3">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Broadcasts & Dispatched Directives</h2>
             {% for alert in alerts %}
-            <div class="p-5 rounded-2xl border bg-white shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition duration-200 {% if not alert.recipient %}border-blue-100 bg-gradient-to-r from-blue-50/30 to-transparent{% else %}border-rose-100 bg-gradient-to-r from-rose-50/30 to-transparent{% endif %}">
-                
-                <div class="flex items-start space-x-3.5">
-                    <div class="mt-0.5 p-1.5 rounded-xl {% if not alert.recipient %}bg-blue-600 text-white{% else %}bg-rose-600 text-white{% endif %} shadow-sm">
-                        {% if not alert.recipient %}
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                        {% endif %}
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start justify-between gap-4 shadow-sm">
+                <div class="flex space-x-3">
+                    <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center text-amber-700 flex-shrink-0 mt-0.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <div>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-[11px] font-bold uppercase tracking-widest {% if not alert.recipient %}text-blue-600{% else %}text-rose-600{% endif %}">
-                                {% if not alert.recipient %}Global Broadcast{% else %}Direct Directive for @{{ alert.recipient.username }}{% endif %}
-                            </span>
-                            <span class="text-[10px] text-slate-400 font-medium">• {{ alert.created_at|timesince }} ago</span>
-                        </div>
-                        <p class="text-sm font-semibold text-slate-800 mt-1 leading-relaxed">{{ alert.message }}</p>
-                        
-                        {% if request.user.is_superuser %}
-                        <div class="mt-2.5 flex items-center space-x-1.5 text-xs text-slate-500 font-medium">
-                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <span>Acknowledged by: </span>
-                            {% for reader in alert.acknowledged_by.all %}
-                                <span class="bg-slate-100 text-slate-700 font-bold px-1.5 py-0.5 rounded text-[10px]">@{{ reader.username }}</span>
-                            {% empty %}
-                                <span class="text-amber-600 font-semibold italic text-[11px]">Awaiting responses...</span>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
+                        <p class="text-sm font-medium text-slate-800 leading-relaxed">{{ alert.message }}</p>
+                        <p class="text-xs text-amber-600 mt-1 font-semibold">{{ alert.created_at|date:"M d, Y • H:i" }}</p>
                     </div>
                 </div>
-
-                <div class="w-full md:w-auto flex justify-end">
-                    {% if not request.user.is_superuser %}
-                    <a href="{% url 'dismiss_notification' alert.pk %}" class="inline-flex items-center px-4 py-2 bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-sm hover:shadow transition-all duration-150 group">
-                        <svg class="w-3.5 h-3.5 mr-1.5 text-slate-400 group-hover:text-white transition duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                        Acknowledge & Clear
-                    </a>
-                    {% else %}
-                    <span class="inline-flex items-center px-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-400 rounded-xl text-xs font-bold">
-                        Tracking Status Engine
-                    </span>
-                    {% endif %}
-                </div>
-
+                <a href="{% url 'dismiss_notification' alert.pk %}" class="text-xs font-bold text-amber-700 hover:text-amber-900 bg-amber-100/60 hover:bg-amber-100 px-3 py-1.5 rounded-lg transition duration-200">
+                    Acknowledge
+                </a>
             </div>
             {% endfor %}
         </div>
         {% endif %}
 
-        <div class="mb-12">
-            <div class="flex items-center space-x-2 mb-5">
-                <span class="h-1.5 w-1.5 rounded-full bg-indigo-600"></span>
-                <h2 class="text-sm font-bold uppercase tracking-widest text-slate-400">Master Organizational Blueprints</h2>
-            </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {% for item in projects %}
-                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-slate-200 transition duration-200 group">
-                    <div>
-                        <h3 class="text-base font-bold text-slate-800 group-hover:text-indigo-600 transition duration-150">{{ item.title }}</h3>
-                        <p class="text-slate-500 text-xs mt-2 leading-relaxed line-clamp-2">{{ item.description }}</p>
+            <div class="lg:col-span-2 space-y-8">
+                <div>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Organizational Project Ledgers</h2>
+                    <div class="space-y-4">
+                        {% for item in projects %}
+                        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition duration-200">
+                            <h3 class="text-lg font-bold text-slate-900">{{ item.title }}</h3>
+                            <p class="text-slate-600 text-sm mt-2 leading-relaxed">{{ item.description }}</p>
+                            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400 font-medium">
+                                <span>Initialization Index: #00{{ item.id }}</span>
+                                <span>{{ item.created_at|date:"F d, Y" }}</span>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-sm text-slate-400 italic">No project entities initialized inside the tracking system core yet.</p>
+                        {% endfor %}
                     </div>
-                    {% if not request.user.is_superuser %}
-                    <div class="mt-5 pt-4 border-t border-slate-50">
-                        <a href="{% url 'log_progress' item.pk %}" class="w-full inline-flex items-center justify-center px-4 py-2 bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 text-xs font-bold text-slate-700 hover:text-indigo-600 rounded-xl transition duration-150">
-                            Log Progress Milestone
-                        </a>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                <div>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Discrete Updates Ledger</h2>
+                    <div class="bg-white border border-slate-200 rounded-2xl divide-y divide-slate-100 shadow-sm overflow-hidden">
+                        {% for update in updates %}
+                        <div class="p-5 hover:bg-slate-50/50 transition duration-150">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">@{{ update.user.username }}</span>
+                                <span class="text-xs font-medium text-slate-400">{{ update.created_at|timesince }} ago</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-slate-800">{{ update.task_done }}</h4>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">{{ update.details }}</p>
+                            
+                            {% if request.user.is_superuser %}
+                            <div class="mt-4 pt-3 border-t border-slate-100/70 flex flex-wrap gap-2 items-center justify-between">
+                                <div class="flex items-center space-x-1.5">
+                                    <a href="{% url 'toggle_update_permission' update.pk %}" class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border transition {{ update.can_update|yesno:'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100,bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200' }}">
+                                        Write: {{ update.can_update|yesno:"Permitted,Revoked" }}
+                                    </a>
+                                    <a href="{% url 'toggle_delete_permission' update.pk %}" class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border transition {{ update.can_delete|yesno:'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100,bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200' }}">
+                                        Purge: {{ update.can_delete|yesno:"Permitted,Revoked" }}
+                                    </a>
+                                </div>
+                                <div class="flex space-x-1">
+                                    <a href="{% url 'edit_progress' update.pk %}" class="text-slate-400 hover:text-indigo-600 p-1 rounded hover:bg-slate-100 transition" title="Modify Log"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></a>
+                                    <a href="{% url 'delete_progress' update.pk %}" class="text-slate-400 hover:text-rose-600 p-1 rounded hover:bg-slate-100 transition" title="Purge Log"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></a>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="mt-3 flex justify-end space-x-1">
+                                {% if update.user == request.user and update.can_update %}
+                                <a href="{% url 'edit_progress' update.pk %}" class="text-slate-400 hover:text-indigo-600 p-1 rounded hover:bg-slate-100 transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></a>
+                                {% endif %}
+                                {% if update.user == request.user and update.can_delete %}
+                                <a href="{% url 'delete_progress' update.pk %}" class="text-slate-400 hover:text-rose-600 p-1 rounded hover:bg-slate-100 transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></a>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                        <div class="p-6 text-center">
+                            <p class="text-xs text-slate-400 italic">No entries committed to the dashboard stream.</p>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% endif %}
                 </div>
-                {% empty %}
-                <div class="col-span-full bg-white text-center py-8 px-4 rounded-2xl border border-dashed border-slate-200">
-                    <p class="text-sm font-medium text-slate-400">No organizational master projects configured by your system supervisor.</p>
-                </div>
-                {% endfor %}
             </div>
-        </div>
 
-        <div>
-            <div class="flex items-center space-x-2 mb-5">
-                <span class="h-1.5 w-1.5 rounded-full bg-indigo-600"></span>
-                <h2 class="text-sm font-bold uppercase tracking-widest text-slate-400">
-                    {% if request.user.is_superuser %}Global Track Performance Register (Full Management Dashboard){% else %}Your Private Task Dispatches Ledger{% endif %}
-                </h2>
-            </div>
-            
-            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-bold uppercase tracking-widest text-slate-400">
-                                <th class="p-4 pl-6">Owner</th>
-                                <th class="p-4">Blueprint Parent</th>
-                                <th class="p-4">Current Sprint Focus</th>
-                                <th class="p-4">Status Indicator</th>
-                                <th class="p-4 pr-6 text-right">Operational Directives</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 text-slate-600 font-medium">
-                            {% for update in updates %}
-                            <tr class="hover:bg-slate-50/50 transition duration-150">
-                                <td class="p-4 pl-6">
-                                    <div class="flex items-center space-x-2.5">
-                                        <div class="h-8 w-8 bg-slate-100 rounded-full flex items-center justify-center font-bold text-xs text-slate-600 border border-slate-200 uppercase">
-                                            {{ update.user.username|slice:":2" }}
-                                        </div>
-                                        <span class="font-bold text-slate-800">@{{ update.user.username }}</span>
-                                    </div>
-                                </td>
-                                
-                                <td class="p-4">
-                                    <span class="px-2.5 py-1 bg-slate-100 border border-slate-200/60 rounded-lg text-xs font-semibold text-slate-700">
-                                        {{ update.project.title }}
-                                    </span>
-                                </td>
-                                
-                                <td class="p-4 max-w-xs md:max-w-md">
-                                    <p class="font-bold text-slate-800 text-sm tracking-tight">{{ update.task_done }}</p>
-                                    <p class="text-xs text-slate-400 mt-0.5 truncate">{{ update.details }}</p>
-                                </td>
-                                
-                                <td class="p-4">
-                                    {% if update.status == 'completed' %}
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/50">
-                                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 mr-1.5"></span>Completed
-                                        </span>
-                                    {% elif update.status == 'active' %}
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/50">
-                                            <span class="h-1.5 w-1.5 rounded-full bg-blue-500 mr-1.5"></span>Active
-                                        </span>
-                                    {% else %}
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/50">
-                                            <span class="h-1.5 w-1.5 rounded-full bg-amber-400 mr-1.5"></span>Planning
-                                        </span>
-                                    {% endif %}
-                                </td>
-                                
-                                <td class="p-4 pr-6 text-right whitespace-nowrap">
-                                    <div class="inline-flex items-center space-x-2">
-                                        {% if request.user.is_superuser %}
-                                            <a href="{% url 'toggle_permission' update.pk %}" class="inline-flex items-center px-3 py-1.5 text-xs font-bold rounded-xl border transition duration-150 {% if update.can_edit %}bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100/70{% else %}bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100/70{% endif %}">
-                                                {% if update.can_edit %}
-                                                    LOCK ACCESS
-                                                {% else %}
-                                                    UNLOCK ACCESS
-                                                {% endif %}
-                                            </a>
-                                            <a href="{% url 'edit_progress' update.pk %}" class="px-3 py-1.5 bg-slate-50 border border-slate-200 hover:bg-slate-100 rounded-xl text-xs font-bold text-slate-700 transition duration-150">Admin Edit</a>
-                                            <a href="{% url 'delete_progress' update.pk %}" class="px-3 py-1.5 bg-rose-50 border border-rose-100 hover:bg-rose-100 rounded-xl text-xs font-bold text-rose-600 transition duration-150">Purge</a>
-                                        {% else %}
-                                            {% if update.can_edit %}
-                                                <a href="{% url 'edit_progress' update.pk %}" class="inline-flex items-center px-4 py-2 bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 text-xs font-bold text-indigo-600 rounded-xl transition duration-150">
-                                                    Modify Log
-                                                </a>
-                                            {% else %}
-                                                <span class="inline-flex items-center px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-400 italic select-none">
-                                                    Record Locked
-                                                </span>
-                                            {% endif %}
-                                        {% endif %}
-                                    </div>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="5" class="p-12 text-center text-slate-400 font-medium">
-                                    No active progress updates logged into this system ledger structure yet.
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
-
     </main>
 
 </body>

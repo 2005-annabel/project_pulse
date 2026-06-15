@@ -1,24 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><title>Join ProjectPulse</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Pulse - Create Account</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body class="bg-gradient-to-br from-blue-600 to-indigo-900 flex items-center justify-center min-h-screen">
-    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full mx-4">
-        <h2 class="text-3xl font-extrabold text-gray-900 text-center mb-2">Create Account</h2>
-        <p class="text-center text-gray-500 text-sm mb-6">Get started tracking your milestones</p>
-        <form method="POST" class="space-y-4">
+<body class="bg-slate-50 flex items-center justify-center min-h-screen antialiased">
+
+    <div class="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+        <div class="flex items-center space-x-3 mb-6 justify-center">
+            <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-md">P</div>
+            <span class="text-xl font-extrabold tracking-tight text-slate-900">Project<span class="text-indigo-600">Pulse</span></span>
+        </div>
+
+        <h2 class="text-center text-lg font-bold text-slate-800 mb-2">Register Workspace Profile</h2>
+        <p class="text-center text-xs text-slate-400 mb-6 uppercase tracking-wider font-semibold">Join the engineering team</p>
+
+        <form method="post" class="space-y-4">
             {% csrf_token %}
-            {% for field in form %}
-                <div>
-                    <label class="block text-xs font-bold uppercase text-gray-600 mb-1">{{ field.label }}</label>
-                    {{ field }}
+            
+            {% if form.errors %}
+                <div class="p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs space-y-1">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <p><strong>{{ field.label }}:</strong> {{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
                 </div>
-            {% endfor %}
-            <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold shadow transition">Register</button>
+            {% endif %}
+
+            <div class="space-y-3" id="django-form-wrapper">
+                {% for field in form %}
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p class="text-[10px] text-slate-400 mt-1 leading-normal">{{ field.help_text }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-100 transition duration-200 cursor-pointer mt-4">
+                Initialize Account
+            </button>
         </form>
-        <p class="text-center text-sm text-gray-500 mt-6">Already have an account? <a href="{% url 'login' %}" class="text-blue-600 hover:underline font-medium">Sign In</a></p>
+
+        <div class="mt-6 pt-4 border-t border-slate-100 text-center">
+            <p class="text-xs text-slate-400">Already possess credentials? <a href="{% url 'login' %}" class="text-indigo-600 font-bold hover:underline">Sign In</a></p>
+        </div>
     </div>
+
+    <script>
+        document.querySelectorAll('#django-form-wrapper input').forEach(input => {
+            input.className = "w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-indigo-600 font-medium text-slate-800";
+        });
+    </script>
 </body>
 </html>

@@ -118,3 +118,4 @@ USE_TZ = True
 STATIC_URL = 'static/'
 # Tell Django to use our custom login view instead of its default path
 LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = 'project_list'  # Redirect to project list after logout
