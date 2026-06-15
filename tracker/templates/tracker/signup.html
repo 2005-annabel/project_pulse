@@ -6,7 +6,7 @@
     <title>Project Pulse - Create Account</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body class="bg-slate-50 flex items-center justify-center min-h-screen antialiased">
+<body class="bg-slate-50 flex items-center justify-center min-h-screen antialiased py-10">
 
     <div class="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
         <div class="flex items-center space-x-3 mb-6 justify-center">
@@ -17,7 +17,7 @@
         <h2 class="text-center text-lg font-bold text-slate-800 mb-2">Register Workspace Profile</h2>
         <p class="text-center text-xs text-slate-400 mb-6 uppercase tracking-wider font-semibold">Join the engineering team</p>
 
-        <form method="post" class="space-y-4">
+        <form method="post" id="signup-form" class="space-y-4">
             {% csrf_token %}
             
             {% if form.errors %}
@@ -38,14 +38,38 @@
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">{{ field.label }}</label>
                         {{ field }}
-                        {% if field.help_text %}
+                        
+                        {% if "password" in field.name %}
+                            {% if field.name == "password1" %}
+                            <div class="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-2 font-medium text-slate-600">
+                                <p class="font-bold text-[10px] uppercase tracking-wider text-slate-400 mb-1">Security Parameters:</p>
+                                
+                                <div id="rule-length" class="flex items-center space-x-2 text-rose-600 transition">
+                                    <span class="status-icon text-sm">❌</span>
+                                    <span>Minimum 8 characters</span>
+                                </div>
+                                <div id="rule-numeric" class="flex items-center space-x-2 text-rose-600 transition">
+                                    <span class="status-icon text-sm">❌</span>
+                                    <span>Cannot be entirely numeric digits</span>
+                                </div>
+                                <div id="rule-common" class="flex items-center space-x-2 text-rose-600 transition">
+                                    <span class="status-icon text-sm">❌</span>
+                                    <span>Cannot be a weak/common sequence (e.g. password123)</span>
+                                </div>
+                                <div id="rule-identity" class="flex items-center space-x-2 text-rose-600 transition">
+                                    <span class="status-icon text-sm">❌</span>
+                                    <span>Cannot contain or closely match your username</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% elif field.help_text %}
                             <p class="text-[10px] text-slate-400 mt-1 leading-normal">{{ field.help_text }}</p>
                         {% endif %}
                     </div>
                 {% endfor %}
             </div>
             
-            <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-100 transition duration-200 cursor-pointer mt-4">
+            <button type="submit" id="submit-btn" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-100 transition duration-200 cursor-pointer mt-4">
                 Initialize Account
             </button>
         </form>
@@ -56,9 +80,74 @@
     </div>
 
     <script>
+        // Apply modern Tailwind formatting automatically to default Django inputs
         document.querySelectorAll('#django-form-wrapper input').forEach(input => {
             input.className = "w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-indigo-600 font-medium text-slate-800";
         });
+
+        // Interactive Validation Logic
+        const usernameInput = document.querySelector('input[name="username"]');
+        const pass1Input = document.querySelector('input[name="password1"]');
+        
+        const ruleLength = document.getElementById('rule-length');
+        const ruleNumeric = document.getElementById('rule-numeric');
+        const ruleCommon = document.getElementById('rule-common');
+        const ruleIdentity = document.getElementById('rule-identity');
+
+        // Blacklist array of basic high-frequency passwords to intercept natively
+        const commonPasswords = ['password', 'password123', '12345678', 'qwertyuiop', 'welcome1'];
+
+        function checkPassword() {
+            const val = pass1Input.value;
+            const username = usernameInput ? usernameInput.value.toLowerCase() : "";
+
+            if (!val) {
+                resetRules();
+                return;
+            }
+
+            // Check 1: Length (8 chars minimum)
+            toggleRule(ruleLength, val.length >= 8);
+
+            // Check 2: Not entirely numeric
+            const isEntirelyNumeric = /^\d+$/.test(val);
+            toggleRule(ruleNumeric, !isEntirelyNumeric);
+
+            // Check 3: Not a basic blacklisted common layout
+            const isCommon = commonPasswords.includes(val.toLowerCase());
+            toggleRule(ruleCommon, !isCommon);
+
+            // Check 4: Similarity to Personal Profile Info (Username check)
+            const isSimilarToUser = username && (val.toLowerCase().includes(username) || username.includes(val.toLowerCase()));
+            toggleRule(ruleIdentity, !isSimilarToUser || !username);
+        }
+
+        function toggleRule(element, isPassed) {
+            const icon = element.querySelector('.status-icon');
+            if (isPassed) {
+                element.classList.remove('text-rose-600');
+                element.classList.add('text-emerald-600');
+                icon.textContent = '✅';
+            } else {
+                element.classList.remove('text-emerald-600');
+                element.classList.add('text-rose-600');
+                icon.textContent = '❌';
+            }
+        }
+
+        function resetRules() {
+            [ruleLength, ruleNumeric, ruleCommon, ruleIdentity].forEach(el => {
+                el.classList.remove('text-emerald-600');
+                el.classList.add('text-rose-600');
+                el.querySelector('.status-icon').textContent = '❌';
+            });
+        }
+
+        // Run validation triggers on profile data adjustments
+        pass1Input.addEventListener('input', checkPassword);
+        if (usernameInput) {
+            usernameInput.addEventListener('input', checkPassword);
+        }
     </script>
 </body>
 </html>

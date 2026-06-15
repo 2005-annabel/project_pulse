@@ -23,4 +23,5 @@ urlpatterns = [
     # Operational Generation Tasks
     path('project/create/', views.create_main_project, name='create_main_project'),  
     path('announcement/send/', views.send_announcement, name='send_announcement'), 
+    path('project/<int:pk>/toggle-status/', views.toggle_project_status, name='toggle_project_status'),
 ]

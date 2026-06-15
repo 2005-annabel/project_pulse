@@ -4,11 +4,12 @@ from django.contrib.auth.models import User
 class Project(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
+    # --- ADD THIS FIELD TO TRACK STATUS ---
+    is_completed = models.BooleanField(default=False) 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.title
-
+        return f"{self.title} {'[COMPLETED]' if self.is_completed else '[ACTIVE]'}"
 class ProgressUpdate(models.Model):
     STATUS_CHOICES = [
         ('planning', 'Planning'),

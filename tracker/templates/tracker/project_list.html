@@ -3,155 +3,288 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Pulse - Dashboard</title>
+    <title>Project Pulse - Command Station</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen">
 
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
                 <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-md shadow-indigo-100">P</div>
-                <span class="text-lg font-extrabold tracking-tight bg-gradient-to-r bg-clip-text from-indigo-600 to-slate-900">Project<span class="text-indigo-600">Pulse</span></span>
+                <span class="text-xl font-extrabold tracking-tight text-slate-900">Project<span class="text-indigo-600">Pulse</span></span>
+                <span class="text-xs bg-slate-100 text-slate-500 px-2.5 py-1 rounded-md font-bold tracking-wider uppercase ml-2">v7.0.0</span>
             </div>
-
-            <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-4">
                 <div class="text-right hidden sm:block">
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Session</p>
-                    <p class="text-sm font-bold text-slate-800">
-                        @{{ request.user.username }} 
-                        {% if request.user.is_superuser %}
-                            <span class="text-xs text-amber-600 font-semibold bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-md ml-1">Supervisor</span>
-                        {% endif %}
-                    </p>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Authenticated Profile</p>
+                    <p class="text-sm font-bold text-slate-800">@{{ request.user.username }} {% if request.user.is_superuser %}(Supervisor){% endif %}</p>
                 </div>
-                
                 <form action="{% url 'logout' %}" method="post" class="inline">
                     {% csrf_token %}
-                    <button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-slate-200 rounded-xl transition duration-200 cursor-pointer">
-                        Sign Out
-                    </button>
+                    <button type="submit" class="px-4 py-2 text-xs font-bold uppercase tracking-wider bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl transition duration-150 cursor-pointer">Sign Out</button>
                 </form>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-6 py-10">
+    <main class="max-w-7xl mx-auto px-6 py-10 space-y-8">
         
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+        {% if alerts %}
+        <div class="space-y-3">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">System Directives & Alerts</h2>
+            <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {% for alert in alerts %}
+                <div class="bg-white border-l-4 border-rose-500 rounded-xl p-4 shadow-xs border border-slate-200/80 flex items-start justify-between">
+                    <div class="space-y-1 pr-4">
+                        <span class="text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded uppercase tracking-wider">Directive</span>
+                        <p class="text-sm font-medium text-slate-700 leading-relaxed">{{ alert.message }}</p>
+                    </div>
+                    <a href="{% url 'dismiss_notification' alert.pk %}" class="text-slate-400 hover:text-slate-600 transition p-1">✕</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs">
             <div>
-                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Workstation Dashboard</h1>
-                <p class="text-slate-500 mt-1 text-sm">Monitor organizational objectives and manage discrete CRUD permissions matrix allocations.</p>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">Operational Command Console</h1>
+                <p class="text-sm text-slate-400">Manage development tasks, track project tracks, and alter active matrices.</p>
             </div>
             
             {% if request.user.is_superuser %}
-            <div class="flex flex-wrap gap-3 w-full md:w-auto">
-                <a href="{% url 'create_main_project' %}" class="flex-1 md:flex-initial inline-flex items-center justify-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-100 hover:shadow-indigo-200 transition duration-200">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                    New Blueprint
+            <div class="flex flex-wrap gap-3">
+                <a href="{% url 'create_main_project' %}" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md shadow-indigo-100 transition duration-150">
+                    + New Blueprint
                 </a>
-                <a href="{% url 'send_announcement' %}" class="flex-1 md:flex-initial inline-flex items-center justify-center px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-rose-100 hover:shadow-rose-200 transition duration-200">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                    Dispatch System Alert
+                <a href="{% url 'send_announcement' %}" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md shadow-rose-100 transition duration-150">
+                    📢 Dispatch Alert
                 </a>
             </div>
             {% endif %}
         </div>
 
-        {% if alerts %}
-        <div class="mb-10 space-y-3">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Broadcasts & Dispatched Directives</h2>
-            {% for alert in alerts %}
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start justify-between gap-4 shadow-sm">
-                <div class="flex space-x-3">
-                    <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center text-amber-700 flex-shrink-0 mt-0.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-slate-800 leading-relaxed">{{ alert.message }}</p>
-                        <p class="text-xs text-amber-600 mt-1 font-semibold">{{ alert.created_at|date:"M d, Y • H:i" }}</p>
-                    </div>
-                </div>
-                <a href="{% url 'dismiss_notification' alert.pk %}" class="text-xs font-bold text-amber-700 hover:text-amber-900 bg-amber-100/60 hover:bg-amber-100 px-3 py-1.5 rounded-lg transition duration-200">
-                    Acknowledge
-                </a>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <div class="lg:col-span-2 space-y-8">
-                <div>
-                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Organizational Project Ledgers</h2>
-                    <div class="space-y-4">
-                        {% for item in projects %}
-                        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition duration-200">
-                            <h3 class="text-lg font-bold text-slate-900">{{ item.title }}</h3>
-                            <p class="text-slate-600 text-sm mt-2 leading-relaxed">{{ item.description }}</p>
-                            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400 font-medium">
-                                <span>Initialization Index: #00{{ item.id }}</span>
-                                <span>{{ item.created_at|date:"F d, Y" }}</span>
+            <div class="lg:col-span-2 space-y-6">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Active Structural Blueprints</h2>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    {% for project in projects %}
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center font-black text-xs">BP</div>
+                                <span class="text-[9px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded border border-emerald-200 uppercase tracking-wider">Active Pipeline</span>
                             </div>
+                            <h3 class="font-bold text-slate-900 tracking-tight text-base">{{ project.title }}</h3>
+                            <p class="text-sm text-slate-500 mt-1.5 leading-relaxed">{{ project.description }}</p>
+                        </div>
+                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Operational</span>
+                            {% if request.user.is_superuser %}
+                            <a href="{% url 'toggle_project_status' project.pk %}" class="text-[10px] font-bold uppercase bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 px-2.5 py-1 rounded-md transition border border-slate-200/60">
+                                ✓ Mark Complete
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-span-2 text-center p-8 bg-slate-100 rounded-2xl border border-dashed border-slate-200 text-sm font-semibold text-slate-400">
+                        No active architecture assets currently deployed to the database workspace environment.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                
+                <div>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Data Log Submissions</h2>
+                    
+                    {% if request.user.is_superuser or updates.first.can_update or updates.count == 0 %}
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
+                        <form method="post" class="space-y-3">
+                            {% csrf_token %}
+                            
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Assign to Blueprint Target</label>
+                                <select name="project_id" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-indigo-600 font-medium text-slate-700">
+                                    <option value="" disabled selected>Select active pipeline target...</option>
+                                    {% for project in projects %}
+                                        <option value="{{ project.id }}">{{ project.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Task Scope Done</label>
+                                <input type="text" name="task_done" placeholder="What mission parameters did you complete?" required 
+                                       class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white text-slate-800 font-medium rounded-xl text-xs transition focus:outline-none">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Technical Summary Logs</label>
+                                <textarea name="details" rows="3" placeholder="Provide deployment metrics or notes..." required 
+                                          class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white text-slate-800 rounded-xl text-xs transition focus:outline-none leading-relaxed"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition cursor-pointer shadow-xs">
+                                Push Logs to Mainframe
+                            </button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-center space-y-2 shadow-xs">
+                        <span class="inline-block text-xl">⚠️</span>
+                        <h4 class="text-xs font-bold text-amber-800 uppercase tracking-wider">Input Stream Dormant</h4>
+                        <p class="text-xs text-amber-600 leading-normal font-medium">A supervisor has restricted your ability to submit data. Contact an admin to restore authorization parameters.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-3">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Discrete Logs Ledger</h2>
+                    <div class="space-y-3 overflow-y-auto max-h-[400px] pr-1">
+                        {% for update in updates %}
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-3">
+                            <div class="flex items-start justify-between">
+                                <div class="space-y-1">
+                                    <div class="flex items-center space-x-1.5 flex-wrap gap-y-1">
+                                        <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md uppercase tracking-wider">@{{ update.user.username }}</span>
+                                        <span class="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded uppercase tracking-wider">{{ update.project.title }}</span>
+                                    </div>
+                                    <h4 class="font-bold text-slate-800 text-sm tracking-tight pt-1">{{ update.task_done }}</h4>
+                                </div>
+                                <div class="flex items-center space-x-1.5">
+                                    {% if update.user == request.user and update.can_update or request.user.is_superuser %}
+                                    <a href="{% url 'edit_progress' update.pk %}" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold px-2 py-1 rounded-md transition">Edit</a>
+                                    {% endif %}
+                                    {% if update.user == request.user and update.can_delete or request.user.is_superuser %}
+                                    <a href="{% url 'delete_progress' update.pk %}" onclick="return confirm('Purge row data permanently?')" class="text-xs bg-rose-50 text-rose-600 font-bold px-2 py-1 rounded-md hover:bg-rose-100 transition">Del</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500 leading-relaxed">{{ update.details }}</p>
                         </div>
                         {% empty %}
-                        <p class="text-sm text-slate-400 italic">No project entities initialized inside the tracking system core yet.</p>
+                        <div class="text-center p-6 bg-slate-100 border border-dashed border-slate-200 rounded-xl text-xs font-semibold text-slate-400">
+                            No active pipeline updates currently tracked.
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="space-y-8">
-                <div>
-                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Discrete Updates Ledger</h2>
-                    <div class="bg-white border border-slate-200 rounded-2xl divide-y divide-slate-100 shadow-sm overflow-hidden">
-                        {% for update in updates %}
-                        <div class="p-5 hover:bg-slate-50/50 transition duration-150">
+        <div class="pt-8 border-t border-slate-200 space-y-4">
+            <div>
+                <h2 class="text-base font-black text-slate-900 tracking-tight">Archived History Ledger</h2>
+                <p class="text-xs text-slate-400">Review repository records for finalized blueprints and closed operations parameters.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-3">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Archived Blueprints</h3>
+                    <div class="space-y-3">
+                        {% for cp in completed_projects %}
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs opacity-75 hover:opacity-100 transition">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">@{{ update.user.username }}</span>
-                                <span class="text-xs font-medium text-slate-400">{{ update.created_at|timesince }} ago</span>
+                                <h4 class="font-bold text-slate-800 text-sm tracking-tight">{{ cp.title }}</h4>
+                                <span class="text-[9px] font-bold text-slate-400 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded uppercase">Closed</span>
                             </div>
-                            <h4 class="text-sm font-bold text-slate-800">{{ update.task_done }}</h4>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">{{ update.details }}</p>
-                            
+                            <p class="text-xs text-slate-500 mb-3">{{ cp.description }}</p>
                             {% if request.user.is_superuser %}
-                            <div class="mt-4 pt-3 border-t border-slate-100/70 flex flex-wrap gap-2 items-center justify-between">
-                                <div class="flex items-center space-x-1.5">
-                                    <a href="{% url 'toggle_update_permission' update.pk %}" class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border transition {{ update.can_update|yesno:'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100,bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200' }}">
-                                        Write: {{ update.can_update|yesno:"Permitted,Revoked" }}
-                                    </a>
-                                    <a href="{% url 'toggle_delete_permission' update.pk %}" class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border transition {{ update.can_delete|yesno:'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100,bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200' }}">
-                                        Purge: {{ update.can_delete|yesno:"Permitted,Revoked" }}
-                                    </a>
-                                </div>
-                                <div class="flex space-x-1">
-                                    <a href="{% url 'edit_progress' update.pk %}" class="text-slate-400 hover:text-indigo-600 p-1 rounded hover:bg-slate-100 transition" title="Modify Log"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></a>
-                                    <a href="{% url 'delete_progress' update.pk %}" class="text-slate-400 hover:text-rose-600 p-1 rounded hover:bg-slate-100 transition" title="Purge Log"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></a>
-                                </div>
-                            </div>
-                            {% else %}
-                            <div class="mt-3 flex justify-end space-x-1">
-                                {% if update.user == request.user and update.can_update %}
-                                <a href="{% url 'edit_progress' update.pk %}" class="text-slate-400 hover:text-indigo-600 p-1 rounded hover:bg-slate-100 transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></a>
-                                {% endif %}
-                                {% if update.user == request.user and update.can_delete %}
-                                <a href="{% url 'delete_progress' update.pk %}" class="text-slate-400 hover:text-rose-600 p-1 rounded hover:bg-slate-100 transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></a>
-                                {% endif %}
-                            </div>
+                            <a href="{% url 'toggle_project_status' cp.pk %}" class="text-[9px] font-bold text-indigo-600 hover:underline">
+                                ↺ Restore to Active Pipeline
+                            </a>
                             {% endif %}
                         </div>
                         {% empty %}
-                        <div class="p-6 text-center">
-                            <p class="text-xs text-slate-400 italic">No entries committed to the dashboard stream.</p>
+                        <p class="text-xs text-slate-400 italic">No blueprints have been archived yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="md:col-span-2 space-y-3">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Historical Progress Records</h3>
+                    <div class="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100 overflow-hidden shadow-xs max-h-[300px] overflow-y-auto">
+                        {% for update in archived_updates %}
+                        <div class="p-4 text-xs space-y-1 hover:bg-slate-50/50">
+                            <div class="flex items-center justify-between">
+                                <div class="space-x-1.5">
+                                    <span class="font-bold text-slate-700">@{{ update.user.username }}</span>
+                                    <span class="text-slate-400 font-semibold">in</span>
+                                    <span class="font-bold text-indigo-600 bg-indigo-50/60 px-1.5 py-0.5 rounded">{{ update.project.title }}</span>
+                                </div>
+                                <span class="text-[10px] text-slate-400">{{ update.created_at|date:"M d, Y" }}</span>
+                            </div>
+                            <h5 class="font-bold text-slate-800 text-xs pt-1">{{ update.task_done }}</h5>
+                            <p class="text-slate-500 leading-relaxed">{{ update.details }}</p>
+                        </div>
+                        {% empty %}
+                        <div class="p-6 text-center text-xs text-slate-400 italic">
+                            No structural logs tied to archived assets in the current repository frame.
                         </div>
                         {% endfor %}
                     </div>
                 </div>
             </div>
-
         </div>
-    </main>
 
+        {% if request.user.is_superuser %}
+        <div class="pt-8 border-t border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Global Team Profiles Matrix</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Change operational security clearances, toggle updaters, or monitor global node keys.</p>
+                </div>
+                <span class="text-xs font-bold bg-indigo-50 border border-indigo-200 text-indigo-700 px-3 py-1 rounded-xl uppercase tracking-wider">Admin Supervisor Mode</span>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50/70 border-b border-slate-200 text-slate-400 font-bold text-[10px] uppercase tracking-wider">
+                            <th class="px-6 py-3.5">Team Username</th>
+                            <th class="px-6 py-3.5">Authorization Tier</th>
+                            <th class="px-6 py-3.5">Active Tracker Node Log Reference</th>
+                            <th class="px-6 py-3.5 text-right">Quick Access Matrix Toggles</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm font-medium text-slate-700">
+                        {% for update in updates %}
+                        <tr class="hover:bg-slate-50/50 transition duration-100">
+                            <td class="px-6 py-4 flex items-center space-x-2">
+                                <div class="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-xs">@</div>
+                                <span class="font-bold text-slate-900">{{ update.user.username }}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                {% if update.user.is_superuser %}
+                                <span class="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border border-indigo-200 uppercase font-bold tracking-wider">Global Admin</span>
+                                {% else %}
+                                <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 uppercase font-bold tracking-wider">Team Member</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 text-xs font-semibold text-slate-400">
+                                Associated Log record: #00{{ update.pk }}
+                            </td>
+                            <td class="px-6 py-4 text-right space-x-1">
+                                <a href="{% url 'toggle_update_permission' update.pk %}" class="inline-block text-xs font-bold px-3 py-1 rounded-xl transition duration-150 border {% if update.can_update %}bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100{% else %}bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100{% endif %}">
+                                    {% if update.can_update %}✓ Can Input/Edit{% else %}✕ Locked Out{% endif %}
+                                </a>
+                                <a href="{% url 'toggle_delete_permission' update.pk %}" class="inline-block text-xs font-bold px-3 py-1 rounded-xl transition duration-150 border {% if update.can_delete %}bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100{% else %}bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100{% endif %}">
+                                    {% if update.can_delete %}✓ Can Purge{% else %}✕ No Delete Rights{% endif %}
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+    </main>
 </body>
 </html>
