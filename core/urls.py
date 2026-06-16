@@ -2,9 +2,9 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    # Fixed: Changed admin.site.get_urls() to admin.site.urls
+    # Built-in Django Admin portal
     path('admin/', admin.site.urls),
     
-    # Fixed: Changed 'tracker/urls.py' to Python module dot-notation 'tracker.urls'
+    # This automatically includes ALL routes from your tracker/urls.py (including login, signup, and project_list)
     path('', include('tracker.urls')), 
 ]
