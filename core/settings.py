@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
+import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +22,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-re(y!*3kx7l2puruubyp58_m&dhgbuu26-53lv2gqp0+h+(r&9'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-re(y!*3kx7l2puruubyp58_m&dhgbuu26-53lv2gqp0+h+(r&9')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Automatically resolves to False when running on Render's web environments
+DEBUG = 'RENDER' not in os.environ
 
 ALLOWED_HOSTS = []
+render_external_url = os.environ.get('RENDER_EXTERNAL_URL')
+if render_external_url:
+    ALLOWED_HOSTS.append(render_external_url.split('//')[-1])
+else:
+    ALLOWED_HOSTS.append('127.0.0.1')
+    ALLOWED_HOSTS.append('localhost')
 
 
 # Application definition
@@ -42,6 +51,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Handles static assets efficiently on production pipelines
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -72,12 +82,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
+# Automatically attaches to a production database if DATABASE_URL environment string exists, otherwise defaults to local SQLite
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600
+    )
 }
 
 
@@ -116,6 +126,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Optimize asset rendering via WhiteNoise backend caching wrappers
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # Tell Django to use our custom login view instead of its default path
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'project_list'  # Redirect to project list after logout
